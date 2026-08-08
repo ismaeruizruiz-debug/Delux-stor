@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delux Store</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#0b0b0f;color:#fff}
+header{padding:28px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #25252d}
+.logo{font-size:28px;font-weight:800}.logo span{color:#8b5cf6}
+button{border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer}
+.admin-btn{background:#8b5cf6;color:#fff}.card{max-width:900px;margin:70px auto;padding:30px 7%}
+.hero{text-align:center}.hero h1{font-size:52px;margin:10px 0}.hero p{color:#aaa}
+.product{margin-top:40px;background:#15151c;border:1px solid #292934;border-radius:18px;padding:28px;display:flex;justify-content:space-between;align-items:center}
+.stock{font-size:18px;color:#bbb}.stock b{color:#4ade80}.buy{background:#fff;color:#111}
+.modal{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:20px}.box{width:100%;max-width:430px;background:#15151c;border:1px solid #30303a;border-radius:18px;padding:28px}
+input{width:100%;padding:13px;margin:10px 0 16px;background:#0d0d12;color:#fff;border:1px solid #383844;border-radius:9px}
+.row{display:flex;gap:10px}.danger{background:#ef4444;color:#fff}.success{background:#22c55e;color:#06120a}
+.close{float:right;background:transparent;color:#aaa;font-size:20px;padding:0}
+.notice{font-size:13px;color:#999;margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Delux <span>Store</span></div>
+  <button class="admin-btn" onclick="openAdmin()">Panel Admin</button>
+</header>
+
+<main class="card">
+  <section class="hero">
+    <h1>Delux Store</h1>
+    <p>Compra rápida y sencilla.</p>
+  </section>
+
+  <section class="product">
+    <div>
+      <h2>Fluorite</h2>
+      <div class="stock">Stock disponible: <b id="stock">0</b></div>
+    </div>
+    <button class="buy" onclick="buy()">Comprar</button>
+  </section>
+</main>
+
+<div class="modal" id="adminModal">
+ <div class="box">
+  <button class="close" onclick="closeAdmin()">×</button>
+  <h2>Panel Admin</h2>
+  <p>Introduce la key de administrador.</p>
+  <input id="adminKey" type="password" placeholder="Key">
+  <button class="admin-btn" onclick="login()">Entrar</button>
+  <div id="adminPanel" style="display:none">
+    <hr style="border-color:#292934;margin:24px 0">
+    <h3>Modificar stock de Fluorite</h3>
+    <input id="stockInput" type="number" min="0" placeholder="Nuevo stock">
+    <div class="row">
+      <button class="success" onclick="saveStock()">Guardar stock</button>
+      <button class="danger" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+  <p class="notice">Key admin configurada: 888.</p>
+ </div>
+</div>
+
+<div class="modal" id="buyerModal">
+ <div class="box">
+  <button class="close" onclick="document.getElementById('buyerModal').style.display='none'">×</button>
+  <h2>Compra</h2>
+  <p>Para compradores, la key requerida es <b>1</b>.</p>
+  <input id="buyerKey" type="password" placeholder="Key de comprador">
+  <button class="buy" onclick="confirmBuy()">Continuar</button>
+  <p id="buyMsg" class="notice"></p>
+ </div>
+</div>
+
+<script>
+const ADMIN_KEY="888";
+const BUYER_KEY="1";
+let stock = Number(localStorage.getItem("deluxStock") ?? 0);
+
+function render(){
+ document.getElementById("stock").textContent=stock;
+ document.getElementById("stockInput").value=stock;
+}
+function openAdmin(){document.getElementById("adminModal").style.display="flex"}
+function closeAdmin(){document.getElementById("adminModal").style.display="none"}
+function login(){
+ if(document.getElementById("adminKey").value===ADMIN_KEY){
+   document.getElementById("adminPanel").style.display="block";
+ }else alert("Key incorrecta.");
+}
+function saveStock(){
+ const value=parseInt(document.getElementById("stockInput").value);
+ if(Number.isInteger(value)&&value>=0){
+   stock=value; localStorage.setItem("deluxStock",stock); render(); alert("Stock actualizado.");
+ }else alert("Introduce un stock válido.");
+}
+function logout(){
+ document.getElementById("adminPanel").style.display="none";
+ document.getElementById("adminKey").value="";
+}
+function buy(){
+ if(stock<=0){alert("Fluorite agotado.");return}
+ document.getElementById("buyerModal").style.display="flex";
+}
+function confirmBuy(){
+ if(document.getElementById("buyerKey").value!==BUYER_KEY){
+   document.getElementById("buyMsg").textContent="Key de comprador incorrecta."; return;
+ }
+ stock--; localStorage.setItem("deluxStock",stock); render();
+ document.getElementById("buyMsg").textContent="Compra registrada. Stock actualizado.";
+}
+render();
+</script>
+</body>
+</html>
